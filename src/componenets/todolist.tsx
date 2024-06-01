@@ -1,19 +1,25 @@
 import { useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { todoListFilterState, todoListState } from "../state/todostate";
-import { Box, Button, Checkbox, Input, Select } from "@chakra-ui/react";
+import {
+	useRecoilState,
+	// useRecoilValue
+} from "recoil";
+import {
+	PRIORITIES,
+	//  todoListFilterState,
+	todoListState,
+} from "../state/todostate";
+import { Box, Button, Checkbox, Flex, Input, Select } from "@chakra-ui/react";
+import { getCurrentColor } from "../lib/getCurrentColor";
 
 function TodoList() {
 	const [todos, setTodos] = useRecoilState(todoListState);
-	const filteredTodo = useRecoilValue(todoListFilterState);
+	// const filteredTodo = useRecoilValue(todoListFilterState);
 	const [newTask, setNewTask] = useState("");
-	const [priority, setPriority] = useState<"high" | "medium" | "normal">(
-		"normal"
-	);
+	const [priority, setPriority] = useState<PRIORITIES>("normal");
 
 	const addTask = () => {
-		setTodos([
-			...todos,
+		setTodos((prev) => [
+			...prev,
 			{ id: Date.now(), text: newTask, priority, completed: false },
 		]);
 		setNewTask("");
@@ -48,16 +54,14 @@ function TodoList() {
 				<div>
 					<Select
 						value={priority}
-						onChange={(e) =>
-							setPriority(e.target.value as "high" | "medium" | "normal")
-						}
+						onChange={(e) => setPriority(e.target.value as PRIORITIES)}
 						style={{
 							width: "fit-content",
 						}}
 					>
-						<option value="High">High</option>
-						<option value="medium">Medium</option>
-						<option value="normal">Normal</option>
+						<option value={"high"}>High</option>
+						<option value={"medium"}>Medium</option>
+						<option value={"normal"}>Normal</option>
 					</Select>
 				</div>
 				<Button size="md" onClick={addTask}>
@@ -65,29 +69,38 @@ function TodoList() {
 				</Button>
 			</Box>
 
-			{filteredTodo.map((todo) => (
-				<Box
-					m={10}
-					p={4}
-					key={todo.id}
-					alignItems="center"
-					bg={todo.completed ? "gray.200" : "gray.300"}
-          rounded={"4px"}
-				>
-					<Checkbox
-						isChecked={todo.completed}
-						onChange={() => checkCompleted(todo.id)}
+			<Flex
+				flexDirection={"column"}
+				gap={5}
+				alignItems={"center"}
+				mt={5}
+				mx={5}
+			>
+				{todos.map((todo) => (
+					<Box
+						w={"100%"}
+						p={4}
+						key={todo.id}
+						alignItems="center"
+						bg={todo.completed ? "gray.300" : getCurrentColor(todo.priority)}
+						rounded={"4px"}
 					>
-						<Box
-							textDecoration={todo.completed ? "line-through" : "none"}
-							p={2}
-							flex={1}
+						<Checkbox
+							isChecked={todo.completed}
+							onChange={() => checkCompleted(todo.id)}
 						>
-							{todo.text}
-						</Box>
-					</Checkbox>
-				</Box>
-			))}
+							<Box
+								textDecoration={todo.completed ? "line-through" : "none"}
+								p={2}
+								flex={1}
+                color={"white"}
+							>
+								{todo.text}
+							</Box>
+						</Checkbox>
+					</Box>
+				))}
+			</Flex>
 		</Box>
 	);
 }
