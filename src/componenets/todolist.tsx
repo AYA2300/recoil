@@ -1,30 +1,14 @@
-import { useState } from "react";
 import {
 	useRecoilState,
 	// useRecoilValue
 } from "recoil";
-import {
-	PRIORITIES,
-	//  todoListFilterState,
-	todoListState,
-} from "../state/todostate";
-import { Box, Button, Checkbox, Flex, Input, Select } from "@chakra-ui/react";
+import { todoListState } from "../state/todostate";
+import { Box, Checkbox, Flex } from "@chakra-ui/react";
 import { getCurrentColor } from "../lib/getCurrentColor";
+import Form from "./Form";
 
 function TodoList() {
 	const [todos, setTodos] = useRecoilState(todoListState);
-	// const filteredTodo = useRecoilValue(todoListFilterState);
-	const [newTask, setNewTask] = useState("");
-	const [priority, setPriority] = useState<PRIORITIES>("normal");
-
-	const addTask = () => {
-		setTodos((prev) => [
-			...prev,
-			{ id: Date.now(), text: newTask, priority, completed: false },
-		]);
-		setNewTask("");
-		setPriority("normal");
-	};
 
 	const checkCompleted = (id: number) => {
 		setTodos(
@@ -36,38 +20,7 @@ function TodoList() {
 
 	return (
 		<Box mt={10} px={5}>
-			<Box
-				display="flex"
-				alignItems={"center"}
-				justifyContent={"center"}
-				gap={4}
-				maxWidth={1200}
-			>
-				<Input
-					value={newTask}
-					onChange={(e) => setNewTask(e.target.value)}
-					placeholder="add new Task"
-					style={{
-						flex: 1,
-					}}
-				/>
-				<div>
-					<Select
-						value={priority}
-						onChange={(e) => setPriority(e.target.value as PRIORITIES)}
-						style={{
-							width: "fit-content",
-						}}
-					>
-						<option value={"high"}>High</option>
-						<option value={"medium"}>Medium</option>
-						<option value={"normal"}>Normal</option>
-					</Select>
-				</div>
-				<Button size="md" onClick={addTask}>
-					Add Task
-				</Button>
-			</Box>
+			<Form />
 
 			<Flex
 				flexDirection={"column"}
@@ -93,7 +46,7 @@ function TodoList() {
 								textDecoration={todo.completed ? "line-through" : "none"}
 								p={2}
 								flex={1}
-                color={"white"}
+								color={"white"}
 							>
 								{todo.text}
 							</Box>
