@@ -1,14 +1,15 @@
 import { Box, Checkbox, Flex } from "@chakra-ui/react";
 import { getCurrentColor } from "../lib/getCurrentColor";
-import { useRecoilState } from "recoil";
-import { todoListState } from "../state/todostate";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { todoListFilterState, todoListState } from "../state/todostate";
 
 const TodoMapper = () => {
-	const [todos, setTodos] = useRecoilState(todoListState);
+	const [, setTodos] = useRecoilState(todoListState);
+	const sortedTodos = useRecoilValue(todoListFilterState);
 
 	const checkCompleted = (id: number) => {
-		setTodos(
-			todos.map((todo) =>
+		setTodos((prev) =>
+			prev.map((todo) =>
 				todo.id === id ? { ...todo, completed: !todo.completed } : todo
 			)
 		);
@@ -17,7 +18,7 @@ const TodoMapper = () => {
 
 	return (
 		<Flex flexDirection={"column"} gap={5} alignItems={"center"} mt={5} mx={5}>
-			{todos.map((todo) => (
+			{sortedTodos.map((todo) => (
 				<Box
 					w={"100%"}
 					p={4}
