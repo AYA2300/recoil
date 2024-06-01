@@ -1,6 +1,7 @@
+/* eslint-disable no-mixed-spaces-and-tabs */
 import { Box, Button, Input, Select } from "@chakra-ui/react";
-import { PRIORITIES, todoListState } from "../state/todostate";
-import { useState } from "react";
+import { PRIORITIES, todoItem, todoListState } from "../state/todostate";
+import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import { useToast } from "@chakra-ui/react";
 
@@ -8,17 +9,46 @@ const Form = () => {
 	const toast = useToast();
 
 	const [, setTodos] = useRecoilState(todoListState);
-	const [newTask, setNewTask] = useState("");
-	const [priority, setPriority] = useState<PRIORITIES>("normal");
+	const [todo, setTodoItem] = useRecoilState(todoItem);
+	const [newTask, setNewTask] = useState(todo ? todo.text : "");
+	const [priority, setPriority] = useState<PRIORITIES>(
+		todo ? todo.priority : "normal"
+	);
+
+	useEffect(() => {
+		if (todo) {
+			setNewTask(todo.text);
+			setPriority(todo.priority);
+		}
+	}, [todo]);
+
+	const handleResetForm = () => {
+		setNewTask("");
+		setPriority("normal");
+	};
 
 	const addTask = () => {
 		if (newTask.length > 0) {
-			setTodos((prev) => [
-				...prev,
-				{ id: Date.now(), text: newTask, priority, completed: false },
-			]);
-			setNewTask("");
-			setPriority("normal");
+			if (!todo) {
+				setTodos((prev) => [
+					...prev,
+					{ id: Date.now(), text: newTask, priority, completed: false },
+				]);
+			} else {
+				setTodos((prev) =>
+					prev.map((item) =>
+						item.id === todo.id
+							? {
+									...todo,
+									text: newTask,
+									priority: priority,
+							  }
+							: item
+					)
+				);
+				setTodoItem(undefined);
+			}
+			handleResetForm();
 		} else {
 			toast({
 				title: "Please Enter A Task",
@@ -34,6 +64,7 @@ const Form = () => {
 			display="flex"
 			alignItems={"center"}
 			justifyContent={"center"}
+			mx={"auto"}
 			gap={4}
 			maxWidth={1200}
 		>
@@ -59,7 +90,7 @@ const Form = () => {
 				</Select>
 			</div>
 			<Button size="md" onClick={addTask}>
-				Add Task
+				{todo ? "Edit" : "Add"} Task
 			</Button>
 		</Box>
 	);
