@@ -1,9 +1,9 @@
 import { atom, selector } from "recoil";
 
-export interface Todo {
+export type Todo = {
   id: number;
   text: string;
-  priority: "High" | "medium" | "normal" | "finish";
+  priority: "high" | "medium" | "normal";
   completed: boolean;
 }
 
@@ -17,7 +17,7 @@ export const todoListFilterState = selector({
   get: ({ get }) => {
     const list = get(todoListState);
     return list.sort((a, b) => {
-      const priorities = { High: 0, medium: 1, normal: 2, finish: 3 };
+      const priorities = { high: 0, medium: 1, normal: 2 };
       return priorities[a.priority] - priorities[b.priority];
     });
   },
